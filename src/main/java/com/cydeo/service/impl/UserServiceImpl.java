@@ -6,11 +6,13 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@Service // how spring understand this class implemented for UserService you have to put @Service annotation.
+@Service
+// how spring understand this class implemented for UserService you have to put @Service annotation.
 //Because you can implement many classes to UserService interface:)
 public class UserServiceImpl implements UserService {
     @Override
     public List<UserDTO> listAllUsers() {
+
         return null;
     }
 
