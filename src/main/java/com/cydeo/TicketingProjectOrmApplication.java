@@ -13,7 +13,8 @@ public class TicketingProjectOrmApplication {
 	}
 
 	@Bean
-	public ModelMapper mapper(){
+	public ModelMapper mapper(){ //if you added 3.part pack to SpringBoot as an external and you want to reach out its object,
+								//you have to implement with @Bean anation then you can use it whenever you want!
 		return new ModelMapper();
 	}
 }
