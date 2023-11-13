@@ -46,13 +46,23 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDTO update(UserDTO dto) {
+        //find current user as a capturing id.I am getting object from database
+        User user = userRepository.findByUserName(dto.getUserName());
 
-        userRepository.save(userMapper.convertToEntity(dto));
-        return null;
+        //converting from dto to entity with map as a updated.
+       User convertedUser =  userMapper.convertToEntity(dto);
+
+        //set id to converted object.
+        convertedUser.setId(user.getId());
+
+        //save updated user
+        userRepository.save(convertedUser);
+
+        return findByUserName(dto.getUserName());
     }
 
     @Override
     public void deleteByUserName(String username) {
-
+      userRepository.deleteByUserName(username);
     }
 }
