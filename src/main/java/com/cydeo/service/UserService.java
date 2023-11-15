@@ -29,4 +29,5 @@ public interface UserService  {
     /**This method is used for deleting a user based on the username.*/
     void deleteByUserName(String username);
 
+    void delete(String username);
 }
