@@ -17,7 +17,7 @@ public class ProjectMapper {
         return modelMapper.map(dto, Project.class);
     }
 
-    public ProjectDTO convertToEntity(Project entity){
+    public ProjectDTO convertToDto(Project entity){
         return modelMapper.map(entity,ProjectDTO.class);
     }
 }
