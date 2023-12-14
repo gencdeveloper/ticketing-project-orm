@@ -5,6 +5,7 @@ import com.cydeo.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import javax.transaction.Transactional;
+import java.util.List;
 
 public interface UserRepository extends JpaRepository<User,Long> {
     //build all queries that will bring data from DB.
@@ -13,4 +14,7 @@ public interface UserRepository extends JpaRepository<User,Long> {
 
     @Transactional // for the ui queriees
     void deleteByUserName(String username);
+
+    //This is derived querry
+    List<User> findAllByRoleDescriptionIgnoreCase(String description);
 }
