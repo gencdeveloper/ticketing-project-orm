@@ -14,7 +14,7 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @Entity
-@Table(name="task")
+@Table(name="tasks")
 public class Task extends BaseEntity {
 
 
