@@ -1,10 +1,15 @@
 package com.cydeo.service.impl;
 
+import com.cydeo.dto.ProjectDTO;
+import com.cydeo.dto.TaskDTO;
 import com.cydeo.dto.UserDTO;
 import com.cydeo.entity.User;
 import com.cydeo.mapper.UserMapper;
 import com.cydeo.repository.UserRepository;
+import com.cydeo.service.ProjectService;
+import com.cydeo.service.TaskService;
 import com.cydeo.service.UserService;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
@@ -19,11 +24,17 @@ public class UserServiceImpl implements UserService {
      * for your Private final injection, java automatically will remind you:) */
     private final UserRepository userRepository;// Inject the UserRepository
     private final UserMapper userMapper; // Inject the UserRepository
+    private final ProjectService projectService;
+    private final TaskService taskService;
 
-    public UserServiceImpl(UserRepository userRepository, UserMapper userMapper) {
+    public UserServiceImpl(UserRepository userRepository, UserMapper userMapper, @Lazy ProjectService projectService, TaskService taskService) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
+        this.projectService = projectService;
+        this.taskService = taskService;
     }
+
+
 
     @Override
     public List<UserDTO> listAllUsers() {
@@ -72,8 +83,25 @@ public class UserServiceImpl implements UserService {
         //I will change the flag and keep it in the db
 
         User user = userRepository.findByUserName(username);
-        user.setIsDeleted(true);
-        userRepository.save(user);
+        if(checkIfUserCanBeDeleted(user)){
+            user.setIsDeleted(true);
+            user.setUserName(user.getUserName() + "-" +user.getId());
+            userRepository.save(user);
+        }
+    }
+
+    private boolean checkIfUserCanBeDeleted(User user){
+        switch (user.getRole().getDescription()){
+            case "Manager" :
+                List<ProjectDTO> projectDTOList = projectService.readAllByAssignedManager(user);
+                return projectDTOList.size() == 0;
+            case "Employee":
+                List<TaskDTO> tasktDTOList = taskService.readAllByAssignedManager(user);
+                return tasktDTOList.size() == 0;
+            default:
+                return true;
+
+        }
     }
 
     @Override

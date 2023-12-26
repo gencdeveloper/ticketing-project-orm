@@ -9,6 +9,7 @@ import com.cydeo.mapper.ProjectMapper;
 import com.cydeo.mapper.TaskMapper;
 import com.cydeo.mapper.UserMapper;
 import com.cydeo.repository.TaskRepository;
+import com.cydeo.repository.UserRepository;
 import com.cydeo.service.TaskService;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -25,10 +26,13 @@ public class TaskServiceImpl implements TaskService {
     private final TaskMapper taskMapper; // Inject the UserRepository
     private final ProjectMapper projectMapper;
 
-    public TaskServiceImpl(TaskRepository taskRepository, TaskMapper taskMapper, ProjectMapper projectMapper) {
+    private final UserRepository userRepository;
+
+    public TaskServiceImpl(TaskRepository taskRepository, TaskMapper taskMapper, ProjectMapper projectMapper, UserRepository userRepository) {
         this.taskRepository = taskRepository;
         this.taskMapper = taskMapper;
         this.projectMapper = projectMapper;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -113,6 +117,37 @@ public class TaskServiceImpl implements TaskService {
             taskDTO.setTaskStatus(Status.COMPLETE);
             update(taskDTO);
         });
+    }
+
+    @Override
+    public List<TaskDTO> listAllTasksByStatusIsNot(Status status) {
+        User loggedInUser = userRepository.findByUserName("john@employee.com");
+        List<Task> list = taskRepository.findAllByTaskStatusIsNotAndAssignedEmployee(status,loggedInUser);
+        return list.stream().map(taskMapper::convertToDTO).collect(Collectors.toList());
+
+    }
+
+    @Override
+    public void updateStatus(TaskDTO dto) {
+        Optional<Task> task = taskRepository.findById(dto.getId());
+
+        if(task.isPresent()){
+            task.get().setTaskStatus(dto.getTaskStatus());
+            taskRepository.save(task.get());
+        }
+    }
+
+    @Override
+    public List<TaskDTO> listAllTasksByStatus(Status status) {
+        User loggedInUser = userRepository.findByUserName("john@employee.com");
+        List<Task> list = taskRepository.findAllByTaskStatusAndAssignedEmployee(status,loggedInUser);
+        return list.stream().map(taskMapper::convertToDTO).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<TaskDTO> readAllByAssignedManager(User assignedEmployee) {
+       List<Task> list = taskRepository.findAllByAssignedEmployee(assignedEmployee);
+       return list.stream().map(taskMapper::convertToDTO).collect(Collectors.toList());
     }
 
     private List<TaskDTO> listAllByProject(ProjectDTO project) {
