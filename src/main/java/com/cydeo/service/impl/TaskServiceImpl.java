@@ -69,7 +69,7 @@ public class TaskServiceImpl implements TaskService {
 
         if(task.isPresent()){
             convertedTask.setId(task.get().getId());
-            convertedTask.setTaskStatus(task.get().getTaskStatus());
+            convertedTask.setTaskStatus(dto.getTaskStatus() == null ? task.get().getTaskStatus() : dto.getTaskStatus());
             convertedTask.setAssignedDate(task.get().getAssignedDate());
             taskRepository.save(convertedTask);
         }
@@ -104,6 +104,15 @@ public class TaskServiceImpl implements TaskService {
     public void deleteByProject(ProjectDTO project) {
         List<TaskDTO> list = listAllByProject(project);
         list.forEach(taskDTO -> delete(taskDTO.getId()));
+    }
+
+    @Override
+    public void completeByProject(ProjectDTO project) {
+        List<TaskDTO> list = listAllByProject(project);
+        list.forEach(taskDTO -> {
+            taskDTO.setTaskStatus(Status.COMPLETE);
+            update(taskDTO);
+        });
     }
 
     private List<TaskDTO> listAllByProject(ProjectDTO project) {
